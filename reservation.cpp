@@ -56,5 +56,19 @@ query.bindValue(":id", res);
 return    query.exec();
 }
 
+QSqlQueryModel * reservation::recherche(QString nom)
+{
 
+    QSqlQueryModel *model=new QSqlQueryModel;
+    QSqlQuery query;
+    query.prepare("select * from reservation where nom = :nom");
+    query.bindValue(":nom",nom);
+    query.exec();
+    model->setQuery(query);
+    model->setHeaderData(0, Qt::Horizontal, QObject::tr("ID"));
+    model->setHeaderData(1, Qt::Horizontal, QObject::tr("Nom "));
+    model->setHeaderData(2, Qt::Horizontal, QObject::tr("type"));
+    model->setHeaderData(3, Qt::Horizontal, QObject::tr("jours"));
+    return model;
+}
 

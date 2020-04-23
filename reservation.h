@@ -16,6 +16,7 @@ public:
     QString get_type();
     QSqlQueryModel * afficher();
     bool supprimer(int);
+     QSqlQueryModel * recherche(QString);
 private:
     QString nom,type;
     int id,jours;

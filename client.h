@@ -6,7 +6,7 @@
 class Client
 {public:
     Client();
-    Client(int,QString,QString,int,QString,int);
+    Client(int,QString,QString,long,QString,int);
     QString get_nom();
     QString get_prenom();
     int get_id();

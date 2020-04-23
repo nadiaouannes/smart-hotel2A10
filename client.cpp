@@ -10,7 +10,7 @@ n_cin=0;
 chambre="";
 jours=0;
 }
-Client::Client(int id,QString nom,QString prenom,int n_cin,QString chambre,int jours)
+Client::Client(int id,QString nom,QString prenom,long n_cin,QString chambre,int jours)
 {
   this->id=id;
   this->nom=nom;
