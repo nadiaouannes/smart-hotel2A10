@@ -24,7 +24,8 @@ public:
      bool supprimer(int);
      bool modifier();
      QSqlQueryModel * tri();
-         QSqlQueryModel * cherch_produit(QString);
+     QSqlQueryModel * recherche_p(QString);
+
 private :
  int ids,prix,quantite;
  QString produit;

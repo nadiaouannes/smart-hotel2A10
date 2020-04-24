@@ -128,18 +128,19 @@ QSqlQueryModel * Stocke::tri()
  }
 
 
-QSqlQueryModel *Stocke::cherch_produit(QString p)
-{
-    QSqlQueryModel * model= new QSqlQueryModel();
-    model->setQuery("select *  from STOCKE where PRODUIT='"+p+"'");
-
-    model->setHeaderData(0, Qt::Horizontal, QObject::tr("ids"));
-    model->setHeaderData(1, Qt::Horizontal, QObject::tr("produit"));
-    model->setHeaderData(2, Qt::Horizontal, QObject::tr("prix"));
-    model->setHeaderData(3, Qt::Horizontal, QObject::tr("quantite"));
-
+QSqlQueryModel *Stocke::recherche_p(QString p)
+ {
+     QSqlQueryModel * model= new QSqlQueryModel();
+     model->setQuery("select * from STOCKE where PRODUIT='"+p+"'");
+     model->setHeaderData(0, Qt::Horizontal, QObject::tr("ids"));
+     model->setHeaderData(1, Qt::Horizontal, QObject::tr("produit"));
+     model->setHeaderData(2, Qt::Horizontal, QObject::tr("prix"));
+      model->setHeaderData(3, Qt::Horizontal, QObject::tr("quantite"));
 
 
-    return model;
-}
+
+
+     return model;
+ }
+
 

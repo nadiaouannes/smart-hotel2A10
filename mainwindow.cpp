@@ -1,31 +1,33 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "client.h"
-#include "reservation.h"
-#include <QMessageBox>
-#include <QPixmap>
-#include <QPainter>
+
+#include "menu.h"
+#include "connexion.h"
+#include "QMessageBox"
+#include "stocke.h"
+#include "QPixmap"
+#include <QSqlQuery>
+#include <QSqlQueryModel>
 #include<QSqlError>
-#include <QPrinter>
-#include<QPrintDialog>
-#include<QPointer>
-#include<QPrintPreviewDialog>
-#include<QFileDialog>
-#include<QTextDocument>
+#include<QPainter>
+#include<QPdfWriter>
 #include<QPaintEvent>
-#include<QSqlRecord>
+
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-ui->setupUi(this);
+    ui->setupUi(this);
+    QPixmap pix("C:/Users/pic");
+    ui->label_pic->setPixmap(pix.scaled(1920,1050,Qt::KeepAspectRatio));
+    QPixmap pix1("C:/Users/pic");
+    ui->label_pic_2->setPixmap(pix.scaled(1920,1050,Qt::KeepAspectRatio));
 
-ui->tmpclient->setModel(tmpclient.afficher());
-QPixmap pix("C:/Users/ASUS/Desktop/p/t.png");
-ui->label_20->setPixmap(pix);
-ui->label_22->setPixmap(pix);
 
 
+    ui->tabmenu->setModel(tmpmenu->afficher());
+     ui->tabstocke->setModel(tmpstocke->afficher());
 }
 
 MainWindow::~MainWindow()
@@ -33,337 +35,331 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_pb_ajouter_clicked()
+
+
+
+
+void MainWindow::on_pb_ajouter_m_clicked()
 {
-    int id = ui->text_id->text().toInt();
-    QString nom= ui->text_nom->text();
-    QString prenom= ui->text_prenom->text();
-    int n_cin = ui->text_cin->text().toInt();
-    QString chambre= ui->comboBox->currentText();
-    int jours = ui->text_jours->text().toInt();
+    int id = ui->lineEdit_id->text().toInt();
+    QString entree= ui->lineEdit_entree->text();
+    QString suite = ui->lineEdit_suite->text();
+    QString dessert = ui->lineEdit_dessert->text();
 
 
-    //QString chambre= ui->lineEdit_ch->text();
-  Client c(id,nom,prenom,n_cin,chambre,jours);
-  bool test=c.ajouter();
+    Menu m(id,entree,suite,dessert);
 
-  if(test)
-{
+    bool test=m.ajouter();
 
-      ui->tmpclient->setModel(tmpclient.afficher());//refresh
-QMessageBox::information(nullptr, QObject::tr("Ajouter un client"),
-                  QObject::tr("client ajouté.\n"
-                              "Click Cancel to exit."), QMessageBox::Cancel);
-
-}
-  else
-      QMessageBox::critical(nullptr, QObject::tr("Ajouter un client"),
-                  QObject::tr("Erreur !.\n"
-                              "Click Cancel to exit."), QMessageBox::Cancel);
-
-
-}
-
-void MainWindow::on_pb_supprimer_clicked()
-{
-int id = ui->lineEdit_id_2->text().toInt();
-bool test=tmpclient.supprimer(id);
-if(test)
-{ui->tmpclient->setModel(tmpclient.afficher());//refresh
-    QMessageBox::information(nullptr, QObject::tr("Supprimer un étudiant"),
-                QObject::tr("Etudiant supprimé.\n"
-                            "Click Cancel to exit."), QMessageBox::Cancel);
-
-}
-else
-    QMessageBox::critical(nullptr, QObject::tr("Supprimer un étudiant"),
-                QObject::tr("Erreur !.\n"
-                            "Click Cancel to exit."), QMessageBox::Cancel);
-
-
-}
-
-/*void MainWindow::on_comboBox_currentIndexChanged(const QString &arg1)
-{
-
-  QString chambre=ui->comboBox->currentText();
-  QSqlQuery qry;
-  qry.prepare("select * from etudiant where chambre='"+chambre+"'");
-  if(qry.exec())
-  {
-      while(qry.next())
-      {
-          ui->text_chambre->setText(qry.value(4).toString());
-      }
-  }
-  else
-  {
-      QMessageBox::critical(this,tr("error"),qry.lastError().text());
-  }
-}*/
-void MainWindow::on_tmpclient_activated(const QModelIndex &index)
-{
-    QString val=ui->tmpclient->model()->data(index).toString();
-    QSqlQuery qry;
-    qry.prepare("select * from etudiant where id='"+val+"'");
-    if(qry.exec())
-    {
-        while(qry.next())
-        {
-            ui->text_id->setText(qry.value(0).toString());
-            ui->text_nom->setText(qry.value(1).toString());
-            ui->text_prenom->setText(qry.value(2).toString());
-            ui->text_cin->setText(qry.value(3).toString());
-            ui->comboBox->currentText();
-            ui->text_jours->setText(qry.value(5).toString());
-        }
-
-    }
-    else
-    {
-        QMessageBox::critical(this,tr("error::"),qry.lastError().text());
-    }
-}
-
-
-void MainWindow::on_modifier_clicked()
-{
-    QString nom,prenom,chambre,id,jours,n_cin;
-    id=ui->text_id->text();
-    nom=ui->text_nom->text();
-    prenom=ui->text_prenom->text();
-    chambre=ui->comboBox->currentText();
-    n_cin=ui->text_cin->text();
-    jours=ui->text_jours->text();
-
-    QSqlQuery qry;
-    qry.prepare("update etudiant set id='"+id+"',nom='"+nom+"' ,prenom='"+prenom+"',n_cin='"+n_cin+"',chambre='"+chambre+"',jours='"+jours+"' where id='"+id+"'");
-    if(qry.exec())
-    {
-        ui->tmpclient->setModel(tmpclient.afficher());//refresh
-        QMessageBox::information(nullptr, QObject::tr("modifier"),
-                          QObject::tr("modifié\n"
-                                      "Click Cancel to exit."), QMessageBox::Cancel);
-    }
-    else
-    {
-        QMessageBox::critical(nullptr, QObject::tr("modifier"),
-                    QObject::tr("Erreur !.\n"
-                                "Click Cancel to exit."), QMessageBox::Cancel);
-    }
-}
-
-void MainWindow::on_pb_ajouter_2_clicked()
-{
-    int id = ui->lineEdit_id_3->text().toInt();
-    QString nom= ui->lineEdit_id_4->text();
-    QString type= ui->comboBox_2->currentText();
-    int jours = ui->lineEdit_id_5->text().toInt();
-
-  reservation r(id,nom,type,jours);
-  bool test=r.ajouter();
-  if(test)
-{
-
-      ui->tabreservation->setModel(tabreservation.afficher());//refresh
-QMessageBox::information(nullptr, QObject::tr("Ajouter une reservation"),
-                  QObject::tr("reservation ajouté.\n"
-                              "Click Cancel to exit."), QMessageBox::Cancel);
-
-}
-  else
-      QMessageBox::critical(nullptr, QObject::tr("Ajouter une reservation"),
-                  QObject::tr("Erreur !.\n"
-                              "Click Cancel to exit."), QMessageBox::Cancel);
-
-
-}
-
-void MainWindow::on_modifier_2_clicked()
-{
-    QString nom,type,id,jours;
-    id=ui->lineEdit_id_3->text();
-    nom=ui->lineEdit_id_4->text();
-    type=ui->comboBox_2->currentText();
-    jours=ui->lineEdit_id_5->text();
-
-    QSqlQuery qry;
-    qry.prepare("update reservation set id='"+id+"',nom='"+nom+"' ,type='"+type+"',jours='"+jours+"' where id='"+id+"'");
-    if(qry.exec())
-    {
-        ui->tabreservation->setModel(tabreservation.afficher());//refresh
-        QMessageBox::information(nullptr, QObject::tr("modifier"),
-                          QObject::tr("modifié\n"
-                                      "Click Cancel to exit."), QMessageBox::Cancel);
-
-    }
-    else
-    {
-
-        QMessageBox::critical(nullptr, QObject::tr("modifier"),
-                    QObject::tr("Erreur !.\n"
-                                "Click Cancel to exit."), QMessageBox::Cancel);
-    }
-}
-
-
-
-
-
-void MainWindow::on_pb_supprimer_2_clicked()
-{
-    int id = ui->lineEdit_id_6->text().toInt();
-    bool test=tabreservation.supprimer(id);
     if(test)
-    {ui->tabreservation->setModel(tabreservation.afficher());//refresh
-        QMessageBox::information(nullptr, QObject::tr("Supprimer une reservation"),
-                    QObject::tr("reservation supprimé.\n"
+  {
+
+        ui->tabmenu->setModel(tmpmenu->afficher());//refresh
+  QMessageBox::information(nullptr, QObject::tr("Ajouter menu"),
+                    QObject::tr("menu ajouté.\n"
                                 "Click Cancel to exit."), QMessageBox::Cancel);
 
-    }
+  }
     else
-        QMessageBox::critical(nullptr, QObject::tr("Supprimer une reservation"),
+        QMessageBox::critical(nullptr, QObject::tr("Ajouter un menu"),
+                    QObject::tr("Erreur !.\n"
+                                "Click Cancel to exit."), QMessageBox::Cancel);
+    ui->lineEdit_ids->clear();
+    ui->lineEdit_produit->clear();
+    ui->lineEdit_prix->clear();
+    ui->lineEdit_quantite->clear();
+
+}
+
+
+
+
+
+
+
+
+
+void MainWindow::on_pb_ajouter_s_clicked()
+{
+    int ids = ui->lineEdit_ids->text().toInt();
+    QString produit= ui->lineEdit_produit->text();
+    int prix = ui->lineEdit_prix->text().toInt();
+    int quantite = ui->lineEdit_quantite->text().toInt();
+
+
+
+    Stocke s(ids,produit,prix,quantite);
+
+    bool test=s.ajouter();
+
+    if(test)
+  {
+
+        ui->tabstocke->setModel(tmpstocke->afficher());//refresh
+  QMessageBox::information(nullptr, QObject::tr("Ajouter stocke"),
+                    QObject::tr("stocke ajouté.\n"
+                                "Click Cancel to exit."), QMessageBox::Cancel);
+
+  }
+    else
+        QMessageBox::critical(nullptr, QObject::tr("Ajouter un stocke"),
                     QObject::tr("Erreur !.\n"
                                 "Click Cancel to exit."), QMessageBox::Cancel);
 
-
+    ui->lineEdit_ids->clear();
+    ui->lineEdit_produit->clear();
+    ui->lineEdit_prix->clear();
+    ui->lineEdit_quantite->clear();
 }
 
 
 
-void MainWindow::on_modifier_3_clicked()
-{
-     QString nom=ui->recherche->text();
-    ui->tmpclient->setModel(tmpclient.recherche(nom));
-}
 
 
-void MainWindow::on_tabreservation_activated(const QModelIndex &index)
+
+
+
+
+void MainWindow::on_pb_supprimer_m_clicked()
 {
-    QString val=ui->tabreservation->model()->data(index).toString();
-    QSqlQuery qry;
-    qry.prepare("select * from reservation where id='"+val+"'");
-    if(qry.exec())
-    {
-        while(qry.next())
-        {
-            ui->lineEdit_id_3->setText(qry.value(0).toString());
-            ui->lineEdit_id_4->setText(qry.value(1).toString());
-            ui->comboBox_2->currentText();
-            ui->lineEdit_id_5->setText(qry.value(3).toString());
+    int id = ui -> lineEdit_id->text().toInt();
+    bool test=tmpmenu->supprimer(id);
+    if(test)
+    { ui->tabmenu->setModel(tmpmenu->afficher());//refresh
+        QMessageBox::information(nullptr, QObject::tr("Supprimer menu"),
+                          QObject::tr("menu supprimer.\n"
+                                      "Click Cancel to exit."), QMessageBox::Cancel);
+
         }
+          else
+              QMessageBox::critical(nullptr, QObject::tr("supprimer un menu"),
+                          QObject::tr("Erreur !.\n"
+                                      "Click Cancel to exit."), QMessageBox::Cancel);
 
-    }
-    else
-    {
-        QMessageBox::critical(this,tr("error::"),qry.lastError().text());
-    }
-}
-
-
-void MainWindow::on_pushButton_2_clicked()
-{
-    ui->tmpclient->setModel(tmpclient.afficher());//refresh
+    ui->lineEdit_ids->clear();
+    ui->lineEdit_produit->clear();
+    ui->lineEdit_prix->clear();
+    ui->lineEdit_quantite->clear();
 
 }
 
 
 
-void MainWindow::on_pushButton_3_clicked()
+
+
+
+
+void MainWindow::on_pb_supprimer_s_clicked()
 {
-    QString str;
-       str.append("<html><head></head><body><center>"+QString("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;;<font size=""10"" color =""red""> GESTION DES CLIENTS </font><br /> <br /> "));
-       str.append("<table border=1><tr>");
-       str.append("<td>"+QString("  ")+"&nbsp;&nbsp;<font color =""blue""  size=""10"">ID</font>&nbsp;&nbsp;"+"</td>");
-       str.append("<td>"+QString("&nbsp;&nbsp;<font color =""blue""  size=""10"">Nom </font>&nbsp;&nbsp;")+"</td>");
-       str.append("<td>"+QString("&nbsp;&nbsp;<font color =""blue""  size=""10"">Prénom</font>&nbsp;&nbsp;")+"</td>");
-       str.append("<td>"+QString("  ")+"&nbsp;&nbsp;<font color =""blue""  size=""10"">n_cin</font>&nbsp;&nbsp;"+"</td>");
-       str.append("<td>"+QString("&nbsp;&nbsp;<font color =""blue""  size=""10"">chambre </font>&nbsp;&nbsp;")+"</td>");
-       str.append("<td>"+QString("&nbsp;&nbsp;<font color =""blue""  size=""10"">jours </font>&nbsp;&nbsp;")+"</td>");
-       QSqlQuery * query=new QSqlQuery();
-       query->exec("select * from etudiant");
-       while(query->next())
-       {
-           str.append("<tr><td>");
-           str.append("&nbsp;&nbsp;<font color =""green"" size= ""10"">"+query->value(0).toString()+"&nbsp;&nbsp;");
-           str.append("</td><td>");
-           str.append("&nbsp;&nbsp;<font color =""green""  size=""10"">"+query->value(1).toString()+"&nbsp;&nbsp;");
-           str.append("</td><td>");
-           str.append("&nbsp;&nbsp;<font color =""green"" size=""10"">"+query->value(2).toString()+"&nbsp;&nbsp;");
-            str.append("</td><td>");
-           str.append("&nbsp;&nbsp;<font color =""green"" size= ""10"">"+query->value(3).toString()+"&nbsp;&nbsp;");
-           str.append("</td><td>");
-           str.append("&nbsp;&nbsp;<font color =""green""  size=""10"">"+query->value(4).toString()+"&nbsp;&nbsp;");
-           str.append("</td><td>");
-           str.append("&nbsp;&nbsp;<font color =""green""  size=""10"">"+query->value(5).toString()+"&nbsp;&nbsp;");
+    int ids = ui -> lineEdit_ids->text().toInt();
+    bool test=tmpstocke->supprimer(ids);
+    if(test)
+    { ui->tabstocke->setModel(tmpstocke->afficher());//refresh
+        QMessageBox::information(nullptr, QObject::tr("Supprimer stocke"),
+                          QObject::tr("stocke supprimer.\n"
+                                      "Click Cancel to exit."), QMessageBox::Cancel);
+
+        }
+          else
+              QMessageBox::critical(nullptr, QObject::tr("supprimer un stocke"),
+                          QObject::tr("Erreur !.\n"
+                                      "Click Cancel to exit."), QMessageBox::Cancel);
+
+    ui->lineEdit_ids->clear();
+    ui->lineEdit_produit->clear();
+    ui->lineEdit_prix->clear();
+    ui->lineEdit_quantite->clear();
+}
 
 
-           }
-       str.append("</table></center><body></html>");
-       QPrinter printer;
-       printer.setOrientation(QPrinter::Portrait);
-       printer.setOutputFormat(QPrinter::PdfFormat);
-       printer.setPaperSize(QPrinter::A4);
-       QString path= QFileDialog::getSaveFileName(NULL,"imprimer","gestion des clients","PDF(*.pdf");
-        if(path.isEmpty()) return;
-        printer.setOutputFileName(path);
-        QTextDocument doc;
-        doc.setHtml(str);
-        doc.print(&printer);
+
+
+
+
+
+
+void MainWindow::on_pb_modifier_m_clicked()
+{
+    int id = ui->lineEdit_id->text().toInt();
+
+            QString entree = ui->lineEdit_entree->text();
+            QString suite = ui->lineEdit_suite->text();
+            QString dessert = ui->lineEdit_dessert->text();
+
+            Menu men (id,entree,suite,dessert);
+
+            QSqlQuery query;
+
+            bool test=men.modifier();
+            if(test)
+            {
+
+ui->tabmenu->setModel(tmpmenu->afficher());//refresh
+                QMessageBox::information(nullptr, QObject::tr("Modifier menu"),
+                            QObject::tr("Menu Modifier.\n"
+                                        "Click Cancel to exit."), QMessageBox::Cancel);
+
+            }
+            else
+            {
+                QMessageBox::critical(nullptr, QObject::tr("Supprimer menu"),
+                            QObject::tr("Erreur !.\n"
+                                        "Click Cancel to exit."), QMessageBox::Cancel);
+            }
+
+            ui->lineEdit_id->clear();
+            ui->lineEdit_entree->clear();
+            ui->lineEdit_suite->clear();
+            ui->lineEdit_dessert->clear();
+
+
+
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+void MainWindow::on_pb_modifier_s_clicked()
+{
+           int ids = ui->lineEdit_ids->text().toInt();
+
+            QString produit = ui->lineEdit_produit->text();
+             int prix = ui->lineEdit_prix->text().toInt();
+              int quantite = ui->lineEdit_quantite->text().toInt();
+
+
+            Stocke stoc (ids,produit,prix,quantite);
+
+            QSqlQuery query;
+
+            bool test=stoc.modifier();
+            if(test)
+            {
+
+ui->tabstocke->setModel(tmpstocke->afficher());//refresh
+                QMessageBox::information(nullptr, QObject::tr("Modifier stocke"),
+                            QObject::tr("Stocke Modifier.\n"
+                                        "Click Cancel to exit."), QMessageBox::Cancel);
+
+            }
+            else
+            {
+                QMessageBox::critical(nullptr, QObject::tr("Supprimer stocke"),
+                            QObject::tr("Erreur !.\n"
+                                        "Click Cancel to exit."), QMessageBox::Cancel);
+            }
+
+            ui->lineEdit_ids->clear();
+            ui->lineEdit_produit->clear();
+            ui->lineEdit_prix->clear();
+            ui->lineEdit_quantite->clear();
+
+
+
+
+}
+
+
+void MainWindow::on_pushButton_trie_m_clicked()
+{
+    ui->tabmenu->setModel(tmpmenu->afficher_tri());
+
+}
+
+void MainWindow::on_pushButton_trie_s_clicked()
+{
+    ui->tabstocke->setModel(tmpstocke->tri());
+}
+
+void MainWindow::on_pb_rech_m_clicked()
+{
+    QString entree = ui->lineEdit_rech_m->text();
+           ui->tabmenu->setModel(tmpmenu->recherche_nom(entree));
+}
+
+
+
+
+
+
+
+
+
+
+
+void MainWindow::on_pb_rech_s_clicked()
+{
+    QString produit = ui->lineEdit_rech_s->text();
+           ui->tabstocke->setModel(tmpstocke->recherche_p(produit));
 }
 
 void MainWindow::on_pushButton_clicked()
 {
-
-    QString str;
-       str.append("<html><head></head><body><center>"+QString("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;;<font size=""10"" color =""red""> GESTION DES CLIENTS </font><br /> <br /> "));
-       str.append("<table border=1><tr>");
-       str.append("<td>"+QString("  ")+"&nbsp;&nbsp;<font color =""blue""  size=""10"">ID</font>&nbsp;&nbsp;"+"</td>");
-       str.append("<td>"+QString("&nbsp;&nbsp;<font color =""blue""  size=""10"">Nom </font>&nbsp;&nbsp;")+"</td>");
-       str.append("<td>"+QString("&nbsp;&nbsp;<font color =""blue""  size=""10"">type</font>&nbsp;&nbsp;")+"</td>");
-       str.append("<td>"+QString("  ")+"&nbsp;&nbsp;<font color =""blue""  size=""10"">jours</font>&nbsp;&nbsp;"+"</td>");
-
-       QSqlQuery * query=new QSqlQuery();
-       query->exec("select * from reservation");
-       while(query->next())
-       {
-           str.append("<tr><td>");
-           str.append("&nbsp;&nbsp;<font color =""green"" size= ""10"">"+query->value(0).toString()+"&nbsp;&nbsp;");
-           str.append("</td><td>");
-           str.append("&nbsp;&nbsp;<font color =""green""  size=""10"">"+query->value(1).toString()+"&nbsp;&nbsp;");
-           str.append("</td><td>");
-           str.append("&nbsp;&nbsp;<font color =""green"" size=""10"">"+query->value(2).toString()+"&nbsp;&nbsp;");
-            str.append("</td><td>");
-           str.append("&nbsp;&nbsp;<font color =""green"" size= ""10"">"+query->value(3).toString()+"&nbsp;&nbsp;");
-
-
-
-           }
-       str.append("</table></center><body></html>");
-       QPrinter printer;
-       printer.setOrientation(QPrinter::Portrait);
-       printer.setOutputFormat(QPrinter::PdfFormat);
-       printer.setPaperSize(QPrinter::A4);
-       QString path= QFileDialog::getSaveFileName(NULL,"imprimer","gestion des reservations","PDF(*.pdf");
-        if(path.isEmpty()) return;
-        printer.setOutputFileName(path);
-        QTextDocument doc;
-        doc.setHtml(str);
-        doc.print(&printer);
-
+    this->close();
 }
 
-void MainWindow::on_pushButton_4_clicked()
+void MainWindow::on_pushButton_2_clicked()
 {
-    QString nom=ui->lineEdit->text();
-   ui->tabreservation->setModel(tabreservation.recherche(nom));
+    this->close();
 }
 
-
-
-
-
-void MainWindow::on_pushButton_5_clicked()
+void MainWindow::on_pb_pdf_m_clicked()
 {
-     ui->tabreservation->setModel(tabreservation.afficher());//refresh
+    //QDateTime datecreation = date.currentDateTime();
+        //QString afficheDC = "Date de Creation PDF : " + datecreation.toString() ;
+               QPdfWriter pdf("C:/Users/HP-PC/Desktop/menu.pdf");
+               QPainter painter(&pdf);
+              int i = 4000;
+                   painter.setPen(Qt::blue);
+                   painter.setFont(QFont("Arial", 30));
+                   painter.drawText(1100,1200,"Liste De menu");
+                   painter.setPen(Qt::black);
+                   painter.setFont(QFont("Arial", 15));
+                  // painter.drawText(1100,2000,afficheDC);
+                   painter.drawRect(100,100,7300,2600);
+                   //painter.drawPixmap(QRect(7600,70,2000,2600),QPixmap("C:/Users/RH/Desktop/projecpp/image/logopdf.png"));
+                   painter.drawRect(0,3000,9600,500);
+                   painter.setFont(QFont("Arial", 9));
+                   painter.drawText(200,3300,"ID");
+                   painter.drawText(1300,3300,"ENTREE");
+                   painter.drawText(2100,3300,"SUITE");
+                   painter.drawText(3200,3300,"DESSERT");
+
+                   QSqlQuery query;
+                   query.prepare("select * from MENU");
+                   query.exec();
+                   while (query.next())
+                   {
+                       painter.drawText(200,i,query.value(0).toString());
+                       painter.drawText(1300,i,query.value(1).toString());
+                       painter.drawText(2200,i,query.value(2).toString());
+                       painter.drawText(3200,i,query.value(3).toString());
+                       painter.drawText(4500,i,query.value(4).toString());
+                       painter.drawText(7700,i,query.value(5).toString());
+                      i = i + 500;
+                   }
+                   int reponse = QMessageBox::question(this, "Génerer PDF", "<PDF Enregistré>...Vous Voulez Affichez Le PDF ?", QMessageBox::Yes |  QMessageBox::No);
+                       if (reponse == QMessageBox::Yes)
+                       {
+
+                           painter.end();
+                       }
+                       if (reponse == QMessageBox::No)
+                       {
+                            painter.end();
+                       }
+}
+
+void MainWindow::on_pushButton_3_clicked()
+{
+    ui->tabmenu->setModel(tmpmenu->afficher());
 }
