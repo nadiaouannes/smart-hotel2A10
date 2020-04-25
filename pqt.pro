@@ -31,10 +31,9 @@ SOURCES += \
     signin.cpp \
     choix.cpp \
     vpersonel.cpp \
-    parking_personnels.cpp \
-    parking_clients.cpp \
     vclients.cpp \
-    perso.cpp
+    perso.cpp \
+    client.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -42,18 +41,16 @@ HEADERS += \
     signin.h \
     choix.h \
     vpersonel.h \
-    parking_personnels.h \
-    parking_clients.h \
     vclients.h \
-    perso.h
+    perso.h \
+    client.h
 
 FORMS += \
         mainwindow.ui \
     signin.ui \
     choix.ui \
-    parking_personnels.ui \
-    parking_clients.ui \
-    perso.ui
+    perso.ui \
+    client.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

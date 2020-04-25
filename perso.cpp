@@ -4,6 +4,11 @@
 #include <QSqlQueryModel>
 #include <QSqlQuery>
 #include <QPixmap>
+#include<QSqlError>
+#include<QPainter>
+#include<QPdfWriter>
+#include<QtWidgets>
+
 
 
 perso::perso(QWidget *parent) :
@@ -11,20 +16,15 @@ perso::perso(QWidget *parent) :
     ui(new Ui::perso)
 {
     ui->setupUi(this);
-    QPixmap pixx("C:/Users/ASUS/Desktop/QT/fond2.jpg");
-    ui->label_pic0->setPixmap(pixx.scaled(935,900,Qt::KeepAspectRatio));
+   // QPixmap pixx("C:/Users/ASUS/Desktop/QT/fond3.png");
+  //  ui->label_pic0->setPixmap(pixx);
 
     QPixmap paw("C:/Users/ASUS/Desktop/QT/retour.png");
     ui->label_5->setPixmap(paw.scaled(181,91,Qt::KeepAspectRatio));
 
-    QPixmap p2("C:/Users/ASUS/Desktop/QT/supp.png");
-    ui->label_supp2->setPixmap(p2.scaled(181,91,Qt::KeepAspectRatio));
 
-    QPixmap pa("C:/Users/ASUS/Desktop/QT/ajj.png");
-    ui->label_add->setPixmap(pa.scaled(181,91,Qt::KeepAspectRatio));
 
-    QPixmap pm2("C:/Users/ASUS/Desktop/QT/mod.png");
-    ui->label_mod2->setPixmap(pm2.scaled(181,91,Qt::KeepAspectRatio));
+    ui->tableView->setModel(tmpide.afficher());
 }
 
 perso::~perso()
@@ -40,19 +40,26 @@ void perso::on_pushButton_clicked()
 void perso::on_ajouter_clicked()
 {
     QString id = ui->lineEdit_id->text();
-    QString nom= ui->lineEdit_nom->text();
-    QString prenom= ui->lineEdit_prenom->text();
-vpersonel e(id,nom,prenom);
+    QString matricule= ui->lineEdit_matricule->text();
+    QString marque= ui->lineEdit_marque->text();
+vpersonel e(id,matricule,marque);
 
     bool test=e.ajouter();
     if(test)
-    {
+    {ui->tableView->setModel(tmpide.afficher());
+
+        QSystemTrayIcon *notifyIcon = new QSystemTrayIcon;
+        notifyIcon->show();
+        notifyIcon->setIcon(QIcon("icone.png"));
+
+        notifyIcon->showMessage("GESTION PARKING  PERSONNELS ","vehicule ajouté",QSystemTrayIcon::Information,15000);
+
     QMessageBox::information(nullptr, QObject::tr("ajouter vehicule"),
                           QObject::tr("vehicule ajouté./n"
                              "click cancel to exit."),QMessageBox::Cancel);
     ui->lineEdit_id->clear();
-    ui->lineEdit_nom->clear();
-    ui->lineEdit_prenom->clear();
+    ui->lineEdit_matricule->clear();
+    ui->lineEdit_marque->clear();
 
     }
 
@@ -65,9 +72,20 @@ vpersonel e(id,nom,prenom);
 void perso::on_pushButton_3_clicked()
 {
     QString id = ui->lineEdit_ids->text();
-    bool test=tmpide.supprimer();
+    bool test=tmpide.supprimer(id);
     if(test)
     {ui->lineEdit_ids->clear();
+        ui->lineEdit_id->clear();
+        ui->lineEdit_matricule->clear();
+        ui->lineEdit_marque->clear();
+        ui->tableView->setModel(tmpide.afficher());
+
+        QSystemTrayIcon *notifyIcon = new QSystemTrayIcon;
+        notifyIcon->show();
+        notifyIcon->setIcon(QIcon("icone.png"));
+
+        notifyIcon->showMessage("GESTION PARKING  PERSONNELS ","véhicule supprimé",QSystemTrayIcon::Information,15000);
+
         QMessageBox::information(nullptr, QObject::tr("Supprimer une véhicule"),
                     QObject::tr("véhicule supprimé.\n"
                                 "Click Cancel to exit."), QMessageBox::Cancel);
@@ -78,40 +96,39 @@ void perso::on_pushButton_3_clicked()
                     QObject::tr("Erreur !.\n"
                      "Click Cancel to exit."), QMessageBox::Cancel);
 
-    ui->label_ids->clear();
+
     ui->lineEdit->clear();
 
 }
 
-void perso::on_lineEdit_ids_textChanged(const QString &arg1)
-{
-    QSqlQueryModel *model= new QSqlQueryModel();
-            QSqlQuery   *query= new QSqlQuery();
 
-            query->prepare("SELECT * FROM Abonne WHERE ID LIKE'"+arg1+"%'order by nom");//+tri
-    query->exec();
-        model->setQuery(*query);
-    ui->tableView->setModel(model);
-}
 
 void perso::on_pushButton_5_clicked()
 {
     QString id = ui->lineEdit_id->text();
-    QString nom = ui->lineEdit_nom->text();
-    QString prenom = ui->lineEdit_prenom->text();
+    QString matricule = ui->lineEdit_matricule->text();
+    QString marque = ui->lineEdit_marque->text();
 
     QSqlQuery query;
-    query.prepare("UPDATE ABONNE SET ID =:id,NOM = :nom,PRENOM = :prenom where ID = :id");
-    query.bindValue(":id",id);
-    query.bindValue(":nom",nom);
-    query.bindValue(":prenom",prenom);
+    query.prepare("UPDATE ABONNE SET ID ='"+id+"',MATRICULE = '"+matricule+"',MARQUE = '"+marque+"' where ID = '"+id+"'");
+;
     bool test = query.exec();
     if(test)
     {
+ui->tableView->setModel(tmpide.afficher());
+        ui->lineEdit_id->clear();
+        ui->lineEdit_matricule->clear();
+        ui->lineEdit_marque->clear();
+        ui->lineEdit_ids->clear();
 
+        QSystemTrayIcon *notifyIcon = new QSystemTrayIcon;
+        notifyIcon->show();
+        notifyIcon->setIcon(QIcon("icone.png"));
 
-        QMessageBox::information(nullptr, QObject::tr("Modifier abonné"),
-                    QObject::tr("véhicule Modifier.\n"
+        notifyIcon->showMessage("GESTION PARKING  PERSONNELS ","véhicule Modifié",QSystemTrayIcon::Information,15000);
+
+        QMessageBox::information(nullptr, QObject::tr("Modifier vehicule"),
+                    QObject::tr("véhicule Modifié.\n"
                                 "Click Cancel to exit."), QMessageBox::Cancel);
 
     }
@@ -122,49 +139,155 @@ void perso::on_pushButton_5_clicked()
                                 "Click Cancel to exit."), QMessageBox::Cancel);
     }
 
-    ui->lineEdit_id->clear();
-    ui->lineEdit_nom->clear();
-    ui->lineEdit_prenom->clear();
-    ui->lineEdit->clear();
-    ui->lineEdit_ids->clear();
+
 }
 
-void perso::on_lineEdit_id_textChanged(const QString &arg1)
-{
-    QSqlQueryModel *model= new QSqlQueryModel();
-            QSqlQuery   *query= new QSqlQuery();
 
-            query->prepare("SELECT * FROM Abonne WHERE ID LIKE'"+arg1+"%'order by nom");//+tri
-    query->exec();
-        model->setQuery(*query);
-    ui->tableView->setModel(model);
-}
 
 void perso::on_lineEdit_textChanged(const QString &arg1)
 {
     QSqlQueryModel *model= new QSqlQueryModel();
             QSqlQuery   *query= new QSqlQuery();
     if(ui->comboBox->currentText()=="ID"){
-        query->prepare("SELECT * FROM Abonne WHERE ID LIKE'"+arg1+"%'order by nom");//+tri
+        query->prepare("SELECT * FROM Abonne WHERE ID LIKE'"+arg1+"%'");//+tri
 query->exec();
     model->setQuery(*query);
 ui->tableView->setModel(model);
-ui->lineEdit_id->setText(arg1);
-ui->lineEdit_ids->setText(arg1);
 
     }
     else {
-        if(ui->comboBox->currentText()=="Nom"){
-            query->prepare("SELECT * FROM Abonne WHERE NOM LIKE'"+arg1+"%'order by nom");//+tri
+        if(ui->comboBox->currentText()=="Matricule"){
+            query->prepare("SELECT * FROM Abonne WHERE MATRICULE LIKE'"+arg1+"%'");//+tri
     query->exec();
         model->setQuery(*query);
     ui->tableView->setModel(model);
         }
-        else {
-            query->prepare("SELECT * FROM Abonne WHERE PRENOM LIKE'"+arg1+"%'order by nom");//+tri
+        else {if(ui->comboBox->currentText()=="Marque"){
+            query->prepare("SELECT * FROM Abonne WHERE MARQUE LIKE'"+arg1+"%'");//+tri
     query->exec();
         model->setQuery(*query);
     ui->tableView->setModel(model);
+            }
         }
     }
+}
+
+
+
+void perso::on_tableView_activated(const QModelIndex &index)
+{
+    QString val=ui->tableView->model()->data(index).toString();
+       QSqlQuery qry;
+       qry.prepare("select * from Abonne where ID='"+val+"'");
+       if(qry.exec())
+       {
+           while(qry.next())
+           {
+               ui->lineEdit_id->setText(qry.value(0).toString());
+               ui->lineEdit_ids->setText(qry.value(0).toString());
+               ui->lineEdit_matricule->setText(qry.value(1).toString());
+               ui->lineEdit_marque->setText(qry.value(2).toString());
+
+           }
+
+       }
+       else
+       {
+           QMessageBox::critical(this,tr("error::"),qry.lastError().text());
+       }
+}
+
+void perso::on_pushButton_2_clicked()
+{
+    //QDateTime datecreation = date.currentDateTime();
+            //QString afficheDC = "Date de Creation PDF : " + datecreation.toString() ;
+                   QPdfWriter pdf("C:/Users/ASUS/Desktop/QT/personels.pdf");
+                   QPainter painter(&pdf);
+                  int i = 4000;
+                       painter.setPen(Qt::blue);
+                       painter.setFont(QFont("Arial", 30));
+                       painter.drawText(1100,1200,"Personels abonnes");
+                       painter.setPen(Qt::black);
+                       painter.setFont(QFont("Arial", 15));
+                      // painter.drawText(1100,2000,afficheDC);
+                       painter.drawRect(100,100,7300,2600);
+                       //painter.drawPixmap(QRect(7600,70,2000,2600),QPixmap("C:/Users/RH/Desktop/projecpp/image/logopdf.png"));
+                       painter.drawRect(0,3000,9600,500);
+                       painter.setFont(QFont("Arial", 9));
+                       painter.drawText(200,3300,"ID");
+                       painter.drawText(1300,3300,"Matricule");
+                       painter.drawText(2100,3300,"Marque");
+
+
+                       QSqlQuery query;
+                       query.prepare("select * from Abonne");
+                       query.exec();
+                       while (query.next())
+                       {
+                           painter.drawText(200,i,query.value(0).toString());
+                           painter.drawText(1300,i,query.value(1).toString());
+                           painter.drawText(2200,i,query.value(2).toString());
+
+
+                          i = i + 500;
+                       }
+                       int reponse = QMessageBox::question(this, "Génerer PDF", "<PDF Enregistré>...Vous Voulez Affichez Le PDF ?", QMessageBox::Yes |  QMessageBox::No);
+                           if (reponse == QMessageBox::Yes)
+                           {
+                               QSystemTrayIcon *notifyIcon = new QSystemTrayIcon;
+                               notifyIcon->show();
+                               notifyIcon->setIcon(QIcon("icone.png"));
+
+                               notifyIcon->showMessage("GESTION PARKING  PERSONNELS ","liste  véhicule prete à imprimer",QSystemTrayIcon::Information,15000);
+                               painter.end();
+                           }
+                           if (reponse == QMessageBox::No)
+                           {
+                                painter.end();
+                           }
+}
+
+void perso::on_pushButton_4_clicked()
+{
+    QSqlQueryModel *model= new QSqlQueryModel();
+            QSqlQuery   *query= new QSqlQuery();
+    if(ui->comboBox_2->currentText()=="ID"){
+        query->prepare("SELECT * FROM Abonne order by ID");//+tri
+query->exec();
+    model->setQuery(*query);
+ui->tableView->setModel(model);
+
+    }
+    else {
+        if(ui->comboBox_2->currentText()=="Matricule"){
+            query->prepare("SELECT * FROM Abonne order by matricule");//+tri
+    query->exec();
+        model->setQuery(*query);
+    ui->tableView->setModel(model);
+        }
+        else {if(ui->comboBox_2->currentText()=="Marque"){
+            query->prepare("SELECT * FROM Abonne order by marque");//+tri
+    query->exec();
+        model->setQuery(*query);
+    ui->tableView->setModel(model);
+        }
+        }
+    }
+}
+
+void perso::on_pushButton_6_clicked()
+{
+    ui->tableView->setModel(tmpide.afficher());
+    ui->comboBox->setCurrentIndex(0);
+    ui->comboBox_2->setCurrentIndex(0);
+    ui->lineEdit_id->clear();
+    ui->lineEdit_ids->clear();
+    ui->lineEdit_matricule->clear();
+    ui->lineEdit_marque->clear();
+    ui->lineEdit->clear();
+    QSystemTrayIcon *notifyIcon = new QSystemTrayIcon;
+    notifyIcon->show();
+    notifyIcon->setIcon(QIcon("icone.png"));
+
+    notifyIcon->showMessage("GESTION PARKING  PERSONNELS ","system actualisé",QSystemTrayIcon::Information,15000);
 }

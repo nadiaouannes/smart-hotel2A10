@@ -10,17 +10,19 @@ class vclients
 {
 public:
     vclients();
-    vclients(QString,QString,QString);
+    vclients(QString,QString,QString,QString);
     QString get_matricule();
      QString get_couleur();
     QString get_marque();
+    QString get_type();
     void Refresh();
-    bool ajouter(int);
-    QSqlQueryModel *afficher();
+    bool ajouter();
+    QSqlQueryModel * afficher();
     bool supprimer(QString);
 
+
 private:
-    QString matricule,marque,couleur;
+    QString matricule,marque,couleur,type;
 };
 
 #endif // VCLIENTS_H

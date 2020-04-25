@@ -1,25 +1,43 @@
-#ifndef ETUDIANT_H
-#define ETUDIANT_H
-#include <QString>
-#include <QSqlQuery>
-#include <QSqlQueryModel>
-class Client
-{public:
-    Client();
-    Client(int,QString,QString,long,QString,int);
-    QString get_nom();
-    QString get_prenom();
-    int get_id();
-    bool ajouter();
-    int get_cin();
-    QString get_ch();
-    int get_j();
-    QSqlQueryModel * afficher();
-    bool supprimer(int);
-    QSqlQueryModel * recherche(QString);
+#ifndef CLIENT_H
+#define CLIENT_H
+#include "vclients.h"
+#include <QDialog>
+
+namespace Ui {
+class client;
+}
+
+class client : public QDialog
+{
+    Q_OBJECT
+
+public:
+    explicit client(QWidget *parent = nullptr);
+    ~client();
+
+private slots:
+    void on_pushButton_clicked();
+
+    void on_ajouter_clicked();
+
+    void on_pushButton_3_clicked();
+
+    void on_tableView_activated(const QModelIndex &index);
+
+    void on_pushButton_5_clicked();
+
+    void on_lineEdit_5_textChanged(const QString &arg1);
+
+    void on_pushButton_2_clicked();
+
+    void on_pushButton_4_clicked();
+
+    void on_pushButton_6_clicked();
+
 private:
-    QString nom,prenom,chambre;
-    int id,n_cin,jours;
+    vclients tmpvehicule;
+
+    Ui::client *ui;
 };
 
-#endif
+#endif // CLIENT_H

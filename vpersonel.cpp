@@ -3,43 +3,50 @@
 #include <QSqlQueryModel>
 vpersonel::vpersonel()
 {
+    id="";
+    matricule="";
+    marque="";
 
 }
-vpersonel::vpersonel(QString a,QString b,QString c)
+vpersonel::vpersonel(QString id,QString matricule,QString marque)
 {
-    id=a;
-    nom=b;
-    prenom=c;
+    this->id=id;
+    this->matricule=matricule;
+    this->marque=marque;
 }
-void vpersonel::setid(QString a)
-{id=a;}
-void vpersonel::setnom(QString b)
-{nom=b;}
-void vpersonel::setprenom(QString c)
-{prenom=c;}
-QString vpersonel::getid()
-{return id;}
-QString vpersonel::getnom()
-{return nom;}
-QString vpersonel::getprenom()
-{return prenom;}
+QString vpersonel::getid(){return id;}
+QString vpersonel::getmatricule(){return matricule;}
+QString vpersonel::getmarque(){return marque;}
+
+
 bool vpersonel::ajouter()
 {
     QSqlQuery query;
-    QString type;
-    query.prepare("INSERT INTO  ABONNE(ID,NOM,PRENOM) VALUES (:id,:nom,:prenom)");
+    query.prepare("INSERT INTO  ABONNE(ID,MATRICULE,MARQUE) VALUES (:id,:matricule,:marque)");
     query.bindValue(":id",id);
-    query.bindValue(":nom",nom);
-    query.bindValue(":prenom",prenom);
+    query.bindValue(":matricule",matricule);
+    query.bindValue(":marque",marque);
     return query.exec();
 }
 
-bool vpersonel::supprimer()
+bool vpersonel::supprimer(QString id)
 {
 QSqlQuery query;
     query.prepare("Delete from ABONNE where ID= :id");
     query.bindValue(":id",id);
 return    query.exec();
+}
+
+QSqlQueryModel * vpersonel::afficher()
+{
+    QSqlQueryModel * model= new QSqlQueryModel();
+model->setQuery("select * from ABONNE");
+model->setHeaderData(0, Qt::Horizontal, QObject::tr("ID"));
+model->setHeaderData(1, Qt::Horizontal, QObject::tr("MATRICULE"));
+model->setHeaderData(2, Qt::Horizontal, QObject::tr("MARQUE"));
+
+
+    return model;
 }
 
 

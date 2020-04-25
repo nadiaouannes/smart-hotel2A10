@@ -1,7 +1,7 @@
 #include "choix.h"
 #include "ui_choix.h"
 #include "perso.h"
-#include "parking_clients.h"
+#include "client.h"
 #include<QtWidgets>
 
 choix::choix(QWidget *parent) :
@@ -33,13 +33,25 @@ void choix::on_pushButton_3_clicked()
 void choix::on_pushButton_2_clicked()
 {
     perso x;
+    QSystemTrayIcon *notifyIcon = new QSystemTrayIcon;
+    notifyIcon->show();
+    notifyIcon->setIcon(QIcon("icone.png"));
+
+    notifyIcon->showMessage("GESTION PARKING  PERSONNELS ","bienvenue",QSystemTrayIcon::Information,15000);
     x.setModal(this);
     x.exec();
+
 }
 
 void choix::on_pushButton_clicked()
 {
-    parking_clients x;
+    client x;
+    QSystemTrayIcon *notifyIcon = new QSystemTrayIcon;
+    notifyIcon->show();
+    notifyIcon->setIcon(QIcon("icone.png"));
+
+    notifyIcon->showMessage("GESTION PARKING  CLIENTS ","bienvenue",QSystemTrayIcon::Information,15000);
     x.setModal(this);
     x.exec();
+
 }

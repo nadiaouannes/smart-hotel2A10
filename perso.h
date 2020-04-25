@@ -3,6 +3,8 @@
 
 #include "vpersonel.h"
 #include <QDialog>
+#include<QPaintEvent>
+#include<QSqlRecord>
 
 namespace Ui {
 class perso;
@@ -23,13 +25,20 @@ private slots:
 
     void on_pushButton_3_clicked();
 
-    void on_lineEdit_ids_textChanged(const QString &arg1);
-
     void on_pushButton_5_clicked();
 
-    void on_lineEdit_id_textChanged(const QString &arg1);
 
     void on_lineEdit_textChanged(const QString &arg1);
+
+
+
+    void on_tableView_activated(const QModelIndex &index);
+
+    void on_pushButton_2_clicked();
+
+    void on_pushButton_4_clicked();
+
+    void on_pushButton_6_clicked();
 
 private:
     Ui::perso *ui;

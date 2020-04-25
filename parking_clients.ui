@@ -28,7 +28,7 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>5</number>
+    <number>4</number>
    </property>
    <widget class="QWidget" name="stackedWidgetPage1">
     <widget class="QPushButton" name="SHOW">

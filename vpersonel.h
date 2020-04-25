@@ -3,23 +3,22 @@
 
 #include <QMainWindow>
 #include <QWidget>
+#include<QSqlQueryModel>
 
 class vpersonel
 {
 private:
-    QString id,nom,prenom;
+    QString id,matricule,marque;
 
 public:
     vpersonel();
     vpersonel(QString,QString,QString);
-    QString getnom();
-    QString getprenom();
+    QString getmatricule();
+    QString getmarque();
     QString getid();
-    void setnom(QString);
-    void setprenom(QString);
-    void setid(QString);
     bool ajouter();
-    bool supprimer();
+    QSqlQueryModel * afficher();
+    bool supprimer(QString);
 };
 
 #endif // VPERSONEL_H

@@ -1,9 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
-
+#include <QSystemTrayIcon>
 #include <QMainWindow>
-#include "menu.h"
-#include "stocke.h"
 
 namespace Ui {
 class MainWindow;
@@ -14,50 +12,24 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    void maFonction(QString const & texte);
+
+
+
+
 
 private slots:
-    void on_pb_ajouter_m_clicked();
+    void on_pushButton_start_clicked();
 
-    void on_pb_ajouter_s_clicked();
-
-    void on_pb_supprimer_m_clicked();
-
-    void on_pb_supprimer_s_clicked();
-
-    void on_pb_modifier_m_clicked();
-
-
-
-    void on_pushButton_trie_m_clicked();
-
-    void on_pb_modifier_s_clicked();
-
-
-
-    void on_pushButton_trie_s_clicked();
-
-    void on_pb_rech_m_clicked();
-
-    void on_pushButton_2_clicked();
-
-    void on_pb_rech_s_clicked();
-
-    void on_tabmenu_activated(const QModelIndex &index);
-
-    void on_pushButton_3_clicked();
-
-    void on_pb_actualiser_m_clicked();
-
-    void on_pushButton_clicked();
-
-    void on_pb_pdf_m_clicked();
+    void on_pushButton_quitter_clicked();
 
 private:
     Ui::MainWindow *ui;
-    Menu *tmpmenu;
-    Stocke *tmpstocke;
+    QSystemTrayIcon * notifier;
+
+
 };
 
 #endif // MAINWINDOW_H

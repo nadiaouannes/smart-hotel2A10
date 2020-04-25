@@ -16,7 +16,7 @@
   <widget class="QPushButton" name="pushButton_3">
    <property name="geometry">
     <rect>
-     <x>824</x>
+     <x>4</x>
      <y>640</y>
      <width>111</width>
      <height>81</height>
@@ -38,6 +38,15 @@
      <height>161</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>Yu Gothic UI Semibold</family>
+     <pointsize>11</pointsize>
+     <weight>7</weight>
+     <italic>false</italic>
+     <bold>false</bold>
+    </font>
+   </property>
    <property name="styleSheet">
     <string notr="true">QPushButton{
 background-color : transparent;
@@ -52,7 +61,7 @@ background-color:rgb(71,200,255);
 }</string>
    </property>
    <property name="text">
-    <string>client</string>
+    <string> parking client</string>
    </property>
   </widget>
   <widget class="QLabel" name="label">
@@ -83,6 +92,15 @@ background-color:rgb(71,200,255);
      <height>161</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>Yu Gothic UI Semibold</family>
+     <pointsize>11</pointsize>
+     <weight>7</weight>
+     <italic>false</italic>
+     <bold>false</bold>
+    </font>
+   </property>
    <property name="styleSheet">
     <string notr="true">QPushButton{
 background-color : transparent;
@@ -97,13 +115,16 @@ background-color:rgb(71,200,255);
 }</string>
    </property>
    <property name="text">
-    <string>personel</string>
+    <string> parking personel</string>
+   </property>
+   <property name="flat">
+    <bool>false</bool>
    </property>
   </widget>
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>820</x>
+     <x>0</x>
      <y>630</y>
      <width>141</width>
      <height>91</height>
